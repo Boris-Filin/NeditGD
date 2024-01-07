@@ -1,6 +1,6 @@
-from SaveLoad import read_level_objects, get_working_level
+from Editor import Editor
 
 if __name__ == '__main__':
-    objects = read_level_objects(get_working_level())
-    for obj in objects:
-        print('\t', obj)
+    editor = Editor.load_current_level()
+    for obj in editor.objects:
+        print(obj)

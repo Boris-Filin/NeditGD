@@ -5,18 +5,22 @@ import xml.etree.ElementTree as ET
 
 from GameObject import *
 
+SAVE_FILE = "CCLocalLevels.dat"
+PATH_TO_SAVE = os.getenv("localappdata") + "\\GeometryDash\\"
+
 
 # Read the file from the given path
 def load_gamesave() -> bytes:
-    save = "CCLocalLevels.dat"
-    fPath = os.getenv("localappdata") + "\\GeometryDash\\"
-
-    fr = open(fPath + save, "rb")
+    fr = open(PATH_TO_SAVE + SAVE_FILE, "rb")
     data = fr.read()
     fr.close()
     return data
 
-# def save_gamesave()
+def overwrite_gamesave(data: bytes):
+    fw = open(PATH_TO_SAVE + SAVE_FILE, "wb")
+    fw.write(data)
+    fw.close()
+
 
 
 # Apply xor to decode/encode data
@@ -25,6 +29,7 @@ def xor_data(data, key) -> str:
     for i in data:
         res.append(i ^ key)
     return bytearray(res).decode()
+
 
 
 # Decrypt gamesave
@@ -37,8 +42,8 @@ def decrypt_gamesave(data: bytes = None) -> bytes:
     fin = zlib.decompress(compressed[10:], -zlib.MAX_WBITS)
     return fin
 
-
-def encryptGamesave(data):
+# Encrypt the gamesave from XML string
+def encryptGamesave(data: bytes):
     compressedData = zlib.compress(data)
     crc32 = struct.pack("I", zlib.crc32(data))
     dataSize = struct.pack("I", len(data))
@@ -57,13 +62,9 @@ def encryptGamesave(data):
         .encode()
     )
     fin = xor_data(encoded, 11).encode()
+    
+    overwrite_gamesave(fin)
 
-    save = "CCLocalLevels.dat"
-    fPath = os.getenv("localappdata") + "\\GeometryDash\\"
-
-    fw = open(fPath + save, "wb")
-    fw.write(fin)
-    fw.close()
 
 
 # Read the gamesave XML;
@@ -125,7 +126,7 @@ def encrypt_level_string(dls) -> str:
 
 
 # Read individual objects from the given level string as a list
-def read_level_objects(level_string: str):
+def read_level_objects(level_string: str) -> dict:
     if level_string is None: level_string = get_working_level_string()
 
     objects = level_string.split(';')[1:]
@@ -135,7 +136,7 @@ def read_level_objects(level_string: str):
     return objects
 
 # Read the level head info - for save purposes only
-def read_level_head(level_string: str):
+def read_level_head(level_string: str) -> str:
     if level_string is None: level_string = get_working_level_string()
 
     return level_string.split(';')[0]
@@ -145,6 +146,10 @@ def get_level_save_string(objects: dict, level_head: str):
     objects_string = ';'.join(map(dict_to_robtop, objects))
     level_string = f'{level_head};{objects_string};'
     return level_string
+
+
+
+# 
 
 def main():
     print('\n'*5)
@@ -165,7 +170,7 @@ def main():
     # objects.append({1: '1049', 2: '195', 3: '15', 155: '2', 36: '1', 51: '10001'})
 
 
-    # objects.append({1: 1935, 2: 75, 3: 15, 155: 2, 13: 1, 36: 1, 120: 4})
+    objects.append({1: 1935, 2: 75, 3: 15, 155: 2, 13: 1, 36: 1, 120: 0.01})
     save_string = get_level_save_string(objects, head)
     encrypted = encrypt_level_string(save_string.encode())
     set_level_data(level_node, encrypted)
