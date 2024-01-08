@@ -51,6 +51,12 @@ class Editor():
         for obj in objects:
             self.add_object(obj, mark_as_scripted)
 
+    def read_objects(self):
+        res = ''
+        for obj in self.objects:
+            res += str(obj) + '\n'
+        return res
+
     # Write the editor object list to the current level file
     def save_changes(self):
         save_string = get_level_save_string(self.objects, self.head)

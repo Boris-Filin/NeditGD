@@ -3,19 +3,21 @@ import struct
 import base64, gzip, zlib
 import xml.etree.ElementTree as ET
 
-from GameObject import *
+# from Properties import *
+from Object import Object
 
 SAVE_FILE = "CCLocalLevels.dat"
 PATH_TO_SAVE = os.getenv("localappdata") + "\\GeometryDash\\"
 
 
-# Read the file from the given path
+# Read the file from the save path
 def load_gamesave() -> bytes:
     fr = open(PATH_TO_SAVE + SAVE_FILE, "rb")
     data = fr.read()
     fr.close()
     return data
 
+# Write the file to the save path
 def overwrite_gamesave(data: bytes):
     fw = open(PATH_TO_SAVE + SAVE_FILE, "wb")
     fw.write(data)
@@ -75,6 +77,7 @@ def read_gamesave_xml(gamesave: bytes = None) -> ET:
     return tree.getroot()
 
 
+
 # Get the last ('current') level on the custom levels list
 def get_working_level_node(root: ET = None) -> ET:
     if root is None: root = read_gamesave_xml()
@@ -97,16 +100,16 @@ def get_working_level_node(root: ET = None) -> ET:
     print('[Nedit]: Reading', name)
     return level
 
-
 # Get the data of the current level
 def get_working_level(level: ET = None) -> str:
     if level is None: level = get_working_level_node()
     
     return level.text
 
-# 
+# Set the data for the level node
 def set_level_data(level: ET, level_encrypted: str):
     level.text = level_encrypted
+
 
 
 # Decode the level data 
@@ -125,6 +128,7 @@ def encrypt_level_string(dls) -> str:
     return encoded_data.decode()
 
 
+
 # Read individual objects from the given level string as a list
 def read_level_objects(level_string: str) -> dict:
     if level_string is None: level_string = get_working_level_string()
@@ -132,7 +136,7 @@ def read_level_objects(level_string: str) -> dict:
     objects = level_string.split(';')[1:]
     if not objects[-1]:
         objects = objects[:-1]
-    objects = list(map(robtop_to_dict, objects))
+    objects = list(map(Object.from_robtop, objects))
     return objects
 
 # Read the level head info - for save purposes only
@@ -142,60 +146,13 @@ def read_level_head(level_string: str) -> str:
     return level_string.split(';')[0]
 
 # Construct the save string from modified objects and head
-def get_level_save_string(objects: dict, level_head: str):
-    objects_string = ';'.join(map(dict_to_robtop, objects))
-    level_string = f'{level_head};{objects_string};'
+def get_level_save_string(objects: list[Object], level_head: str):
+    obj_encodings = [obj.to_robtop() for obj in objects]
+    obj_string = ';'.join(obj_encodings)
+    level_string = f'{level_head};{obj_string};'
     return level_string
 
 
-
-# 
-
-def main():
-    print('\n'*5)
-    root = read_gamesave_xml()
-    level_node = get_working_level_node(root)
-    level_data = get_working_level(level_node)
-    level = get_working_level_string(level_data)
-    head = read_level_head(level)
-    objects = read_level_objects(level)
-    print(objects)
-
-# Modify level XML
-    # objects.append({1: '1', 2: '75', 3: '45', 57: '10000', 155: '1'})
-    # objects.append({1: '1', 2: '75', 3: '75', 57: '10001', 155: '1'})
-
-    # objects.append({1: '1049', 2: '195', 3: '15', 155: '2', 36: '1', 51: '10000'})
-
-    # objects.append({1: '1049', 2: '195', 3: '15', 155: '2', 36: '1', 51: '10001'})
-
-
-    objects.append({1: 1935, 2: 75, 3: 15, 155: 2, 13: 1, 36: 1, 120: 0.01})
-    save_string = get_level_save_string(objects, head)
-    encrypted = encrypt_level_string(save_string.encode())
-    set_level_data(level_node, encrypted)
-
-    dec_enc = get_working_level_string(encrypted)
-    print(read_level_objects(dec_enc))
-
-# Encode XML
-    xml_str = ET.tostring(root)
-    encryptGamesave(xml_str)
-
-    # print(ET.tostring(level_node))
-
-# Write XML to file
-
-
-
-# TODO:
-    # Replace function call chain with calls from a single place,
-    # Make methods that only fetch and write objects rather than rely
-    # on user to extract data
-
-
-if __name__ == '__main__':
-    main()
 
 '''
 Decryption/Encryption process:
