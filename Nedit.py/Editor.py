@@ -1,8 +1,18 @@
 from SaveLoad import *
+from Object import Object
 
+WATERMARK_TEXT = [
+    Object(id=914, x=-165, y=-15, scale=0.75,
+           text="Made with Nedit"),
+    Object(id=914, x=-213, y=-33, scale=0.5,
+           text="by Nemo2510"),
+    Object(id=914, x=-135, y=-45, scale=0.2,
+           text="(You can remove this watermark, "
+           "but we'd appreciate it if you didn't)")
+]
 
-GROUPS = 57
-
+# The class that stores all loaded objects and handles
+# interactions with the SaveLoad system for the user
 class Editor():
     __root = None
     __level_node = None
@@ -30,7 +40,7 @@ class Editor():
     def remove_scripted_objects(self) -> None:
         res = []
         for obj in self.objects:
-            groups = obj.get(GROUPS)
+            groups = obj.get('groups')
             if groups is None or not 9999 in groups:
                 res.append(obj)
         self.objects = res
@@ -39,11 +49,12 @@ class Editor():
     # Mark it with group 9999
     def add_object(self, obj: dict, mark_as_scripted: bool=True):
         if mark_as_scripted:
-            groups = obj.get(57)
+            groups = obj.groups
             if groups is None:
-                obj[GROUPS] = [9999]
+                obj.groups = [9999]
             else:
                 groups.append(9999)
+
         self.objects.append(obj)
 
     # Add multiple ojects to the editor
@@ -59,13 +70,14 @@ class Editor():
 
     # Write the editor object list to the current level file
     def save_changes(self):
+        self.add_objects(WATERMARK_TEXT)
+
         save_string = get_level_save_string(self.objects, self.head)
         encrypted = encrypt_level_string(save_string.encode())
         set_level_data(self.__level_node, encrypted)
 
-        dec_enc = get_working_level_string(encrypted)
-        print(read_level_objects(dec_enc))
-
         xml_str = ET.tostring(self.__root)
         encryptGamesave(xml_str)
+
+    
 

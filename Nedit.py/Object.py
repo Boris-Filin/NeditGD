@@ -4,15 +4,20 @@ from typing import Any
 from Dictionaries.PropertyID import NAME_TO_ID
 import Properties
 
-
+# A class that represents a Geometry Dash object
+# as a dictionary containing all of its properties.
+# Each property can be accesed either with its property id
+# (decided by RobTop), or by a string alias (assigned by Nedit).
 class Object(UserDict):
+    # The object can be initialised with some properties;
+    # id, x, y, and _155 have to be set by default.
     def __init__(self, **kwargs):
         super().__init__({1:1, 2:0, 3:0, 155:1})
         for k, v in kwargs.items():
             self.__setitem__(k, v)
 
-
-
+    # When the object is accessed as a dictionary,
+    # it automatically converts property aliases to integer ids
     def __setitem__(self, key: int | str, item: Any) -> None:
         if type(key) is int:
             return self.data.__setitem__(key, item)
@@ -24,6 +29,8 @@ class Object(UserDict):
         except: pass
         raise KeyError(f'Objects have no property called \'{key}\'.')
     
+    # When the object is accessed as a dictionary,
+    # it automatically converts property aliases to integer ids
     def __getitem__(self, key: int | str) -> Any:
         if type(key) is int:
             return self.data.__getitem__(key)
@@ -38,32 +45,32 @@ class Object(UserDict):
     
 
 
+    # When a property is accessed as a Python property, it is
+    # converted to integer id and fetched from the object dictionary.
     def __setattr__(self, __name: str, __value: Any) -> None:
-        if hasattr(self, __name):
-            super().__setattr__(__name, __value)
         if (_id := NAME_TO_ID.get(__name)) is not None:
             return self.data.__setitem__(_id, __value)
         try:
             _id = int(__name[1:])
             return self.data.__setitem__(_id, __value)
-        except ValueError:
-            pass
-        except AttributeError:
-            raise AttributeError(
-                f'Objects have no property called \'{__name}\'.')
+        except:
+            super().__setattr__(__name, __value)
 
-    
+    # When a property is accessed as a Python property, it is
+    # converted to integer id and fetched from the object dictionary.
     def __getattr__(self, __name):
         if (_id := NAME_TO_ID.get(__name)) is not None:
-            return self.data.__getitem__(_id)
+            return self.data.get(_id)
         try:
             _id = int(__name[1:])
-            return self.data.__getitem__(_id)
+            return self.data.get(_id)
         except:
-            pass
+            return super().__getattr__(__name)
     
 
 
+    # When loading from a game save, every object is
+    # reconstructed from RobTop's string encoding.
     @classmethod
     def from_robtop(cls, rob: str) -> Object:
         obj = {}
@@ -74,6 +81,7 @@ class Object(UserDict):
             obj[f'_{k}'] = Properties.decode_property_pair(int(k), v)
         return Object(**obj)
     
+    # To save an object, it is converted to RobTop's string encoding.
     def to_robtop(self) -> str:
         res = ''
         for (k, v) in self.data.items():
@@ -81,7 +89,8 @@ class Object(UserDict):
         return res[:-1]
     
 
-
+    # The string representation of the object uses property aliases,
+    # which have to be deduced from property ids.
     def __str__(self) -> str:
         descr = ''
         for k, v in self.data.items():
@@ -90,7 +99,10 @@ class Object(UserDict):
                 if _id == k:
                     key_str = name
                     break
-            descr += f'{key_str}: {v}, '
+            if type(v) is str:
+                descr += f'{key_str}=\"{v}\", '
+            else:
+                descr += f'{key_str}={v}, '
         descr = f'Object({descr[:-2]})'
         return descr
 
@@ -104,5 +116,6 @@ if __name__ == '__main__':
     obj._4 = 1
     print(obj.x)
     print(obj[4])
+    print(obj[5])
     obj._57 = []
     print(obj.to_robtop())
