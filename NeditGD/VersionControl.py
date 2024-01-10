@@ -39,6 +39,7 @@ def read_message(name: str) -> None:
     msg = load_from_file(name).split('#')[0]
     print(f'[Nedit]: Save description:\n{msg}')
 
+# A printed menu with all the options
 def menu() -> None:
     saves = os.listdir(PATH)
     print_saves(saves)
