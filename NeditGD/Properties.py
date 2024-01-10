@@ -28,6 +28,16 @@ def encode_property(p_id: int, data: str) -> str:
     
     return f'{p_id},{data},'
 
+# Get the name of a property if one exists,
+# else get ID with leading underscore
+def get_property_name(p_id: int):
+    key_str = f'_{p_id}'
+    for name, _id in NAME_TO_ID.items():
+        if _id == p_id:
+            key_str = name
+            break
+    return key_str
+
 # Decode a list encoded RobTop's way
 def decode_list(data: str) -> list[int]:
     return list(map(int, data.split('.')))

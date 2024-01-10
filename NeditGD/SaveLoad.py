@@ -134,8 +134,9 @@ def read_level_objects(level_string: str) -> dict:
     if level_string is None: level_string = get_working_level_string()
 
     objects = level_string.split(';')[1:]
-    if not objects[-1]:
-        objects = objects[:-1]
+    while objects and not objects[-1]:
+        if objects and not objects[-1]:
+            objects = objects[:-1]
     objects = list(map(Object.from_robtop, objects))
     return objects
 

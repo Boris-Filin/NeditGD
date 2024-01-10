@@ -1,5 +1,7 @@
+from __future__ import annotations
 from SaveLoad import *
 from Object import Object
+
 
 WATERMARK_TEXT = [
     Object(id=914, x=-165, y=-15, scale=0.75,
@@ -16,22 +18,36 @@ WATERMARK_TEXT = [
 class Editor():
     __root = None
     __level_node = None
+    __level_string = None
     head = None
     objects = None
 
     # Create an editor object that automatically loads
     # the contents of the current level
     @classmethod
-    def load_current_level(cls, remove_scripted: bool=True) -> object:
+    def load_current_level(cls, remove_scripted: bool=True) -> Editor:
         editor = Editor()
         editor.__root = read_gamesave_xml()
         editor.__level_node = get_working_level_node(editor.__root)
         level_data = get_working_level(editor.__level_node)
-        level_str = get_working_level_string(level_data)
-        editor.head = read_level_head(level_str)
-        editor.objects = read_level_objects(level_str)
+        editor.__level_string = get_working_level_string(level_data)
+        editor.head = read_level_head(editor.__level_string)
+        editor.objects = read_level_objects(editor.__level_string)
         if remove_scripted:
             editor.remove_scripted_objects()
+        return editor
+    
+
+    # Load the editor, reading objects from a provided string
+    # instead of the game savefile
+    @classmethod
+    def load_from_robtop(cls, robtop: str) -> Editor:
+        editor = Editor()
+        editor.__root = read_gamesave_xml()
+        editor.__level_node = get_working_level_node(editor.__root)
+        editor.__level_string = robtop
+        editor.head = read_level_head(editor.__level_string)
+        editor.objects = read_level_objects(editor.__level_string)
         return editor
 
 
@@ -72,12 +88,17 @@ class Editor():
     def save_changes(self):
         self.add_objects(WATERMARK_TEXT)
 
-        save_string = get_level_save_string(self.objects, self.head)
+        save_string = self.get_robtop_string()
         encrypted = encrypt_level_string(save_string.encode())
         set_level_data(self.__level_node, encrypted)
 
         xml_str = ET.tostring(self.__root)
         encryptGamesave(xml_str)
+        print('[Nedit]: Changes saved!')
 
-    
+
+    # Get the string representation of the current level
+    # with RobTop's encoding
+    def get_robtop_string(self) -> str:
+        return get_level_save_string(self.objects, self.head)
 

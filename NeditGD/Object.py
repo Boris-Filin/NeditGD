@@ -94,11 +94,7 @@ class Object(UserDict):
     def __str__(self) -> str:
         descr = ''
         for k, v in self.data.items():
-            key_str = f'_{k}'
-            for name, _id in NAME_TO_ID.items():
-                if _id == k:
-                    key_str = name
-                    break
+            key_str = Properties.get_property_name(k)
             if type(v) is str:
                 descr += f'{key_str}=\"{v}\", '
             else:
