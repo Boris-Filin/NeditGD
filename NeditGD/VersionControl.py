@@ -41,8 +41,10 @@ def read_message(name: str) -> None:
 
 # A printed menu with all the options
 def menu() -> None:
-    saves = os.listdir(PATH)
-    print_saves(saves)
+    saves = None
+    if os.path.exists(PATH):
+        saves = os.listdir(PATH)
+        print_saves(saves)
 
     print('[Nedit]: Select options:\n'
           '  (1): Save current level\n'
@@ -56,7 +58,7 @@ def menu() -> None:
         msg = input('[Nedit]: Enter an optional save description: ')
         record_current_level(name, msg)
 
-    elif inp == '2':
+    elif inp == '2' and saves:
         print('[Nedit]: WARNING: This will overwrite the most '
               'recent level in your custom levels list! Make sure'
               'you have put an empty level there!')
@@ -70,6 +72,9 @@ def menu() -> None:
             print('[Nedit]: Save not found!')
             quit()
         overload_current_level(name)
+
+    elif inp == '2':
+        print('[Nedit]: You have no levels saved!')
 
     elif inp == '3':
         print('[Nedit]: Please select one of the listed saves to read!')

@@ -82,22 +82,32 @@ def read_gamesave_xml(gamesave: bytes = None) -> ET:
 def get_working_level_node(root: ET = None) -> ET:
     if root is None: root = read_gamesave_xml()
     
-    levels_node = root[0][1][3]
+    try:
+        levels_node = root[0][1][3]
+    except:
+        raise Exception('[Nedit]: No levels could be found!')
 
     name, level = None, None
 
     for (i, child) in enumerate(levels_node):
-        if child.text != 'k4': continue
-        name = levels_node[i-1].text
-        level = levels_node[i+1]
-        # level = levels_node[i+1].text
-        break
-        i += 1
+        if child.text == 'k2':
+            name = levels_node[i+1].text
+        if child.text == 'k4':
+            level = levels_node[i+1]
+            break
+
+    print('[Nedit]: Reading', name)
 
     if level is None:
-        raise Exception('[Nedit]: Level not found!')
+        print('[Nedit]: Level has not been initialised! '
+              'Loading default level data...')
+        k4_el = ET.Element('k')
+        k4_el.text = 'k4'
+        levels_node.append(k4_el)
+        
+        level = ET.Element('s')
+        levels_node.append(level)
     
-    print('[Nedit]: Reading', name)
     return level
 
 # Get the data of the current level

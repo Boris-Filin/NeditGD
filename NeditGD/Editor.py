@@ -27,12 +27,7 @@ class Editor():
     @classmethod
     def load_current_level(cls, remove_scripted: bool=True) -> Editor:
         editor = Editor()
-        editor.__root = read_gamesave_xml()
-        editor.__level_node = get_working_level_node(editor.__root)
-        level_data = get_working_level(editor.__level_node)
-        editor.__level_string = get_working_level_string(level_data)
-        editor.head = read_level_head(editor.__level_string)
-        editor.objects = read_level_objects(editor.__level_string)
+        editor.load_level_data()
         if remove_scripted:
             editor.remove_scripted_objects()
         return editor
@@ -43,13 +38,39 @@ class Editor():
     @classmethod
     def load_from_robtop(cls, robtop: str) -> Editor:
         editor = Editor()
-        editor.__root = read_gamesave_xml()
-        editor.__level_node = get_working_level_node(editor.__root)
-        editor.__level_string = robtop
-        editor.head = read_level_head(editor.__level_string)
-        editor.objects = read_level_objects(editor.__level_string)
+        editor.load_level_data(robtop)
         return editor
+    
 
+    def load_level_data(self, data: str = None) -> None:
+        self.__root = read_gamesave_xml()
+        self.__level_node = get_working_level_node(self.__root)
+        if not self.__level_node.text:
+            self.load_default_level()
+            return
+        level_data = get_working_level(self.__level_node)
+        if data is not None:
+            self.__level_string = data
+        else:
+            self.__level_string = get_working_level_string(level_data)
+        self.head = read_level_head(self.__level_string)
+        self.objects = read_level_objects(self.__level_string)
+    
+    # New levels aren't initialised until the player saves them for
+    # the first time. This method loads the default data for a level
+    # and initialises it ahead of GD.
+    def load_default_level(self) -> None:
+        try:
+            fr = open(os.getcwd() + '\\DefaultLevel', "r")
+            data = fr.read()
+            fr.close()
+        except:
+            raise FileNotFoundError('Default level data missing!\n'
+                                    'Reinstall the library or just'
+                                    'save and exit the level in GD.')
+        self.head = read_level_head(data)
+        self.objects = []
+        print('[Nedit]: Level initialised successfully!')
 
     # Remove the previously scripted objects;
     # It is assumed that they are marked with group 9999
@@ -78,6 +99,7 @@ class Editor():
         for obj in objects:
             self.add_object(obj, mark_as_scripted)
 
+    # Get a string representing all objects in readable format
     def read_objects(self):
         res = ''
         for obj in self.objects:
