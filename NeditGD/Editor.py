@@ -41,7 +41,7 @@ class Editor():
         editor.load_level_data(robtop)
         return editor
     
-
+    # Load the editor data
     def load_level_data(self, data: str = None) -> None:
         self.__root = read_gamesave_xml()
         self.__level_node = get_working_level_node(self.__root)
@@ -77,7 +77,7 @@ class Editor():
     def remove_scripted_objects(self) -> None:
         res = []
         for obj in self.objects:
-            groups = obj.get('groups')
+            groups = obj.groups
             if groups is None or not 9999 in groups:
                 res.append(obj)
         self.objects = res
