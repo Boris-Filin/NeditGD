@@ -101,14 +101,20 @@ NAME_TO_ID = {
     'free_cam_easing': 113,
     'free_cam_padding': 114,
     'ord': 115,
+    'no_effects': 116,
     'reversed': 118,
     'song_start': 119,
     'time_mod': 120,
+    'no_touch': 121,
     'scale_x': 128,
     'scale_y': 129,
     'perspective_x': 131,
     'perspective_y': 132,
     'only_move': 133,
+    'passable': 134,
+    'hide': 135,
+    'nonstick_x': 136,
+    'ice_block': 137,
     'player_1': 138,
     'override_count': 139,
     'follow_camera_x': 141,
@@ -129,6 +135,7 @@ NAME_TO_ID = {
     'camera_edge': 164,
     'keep_velocity': 169,
     'change_channel': 171,
+    'grip_slope': 193,
     'hide_mg': 195,
     'player_only': 198,
     'disable_controls_p1': 199,
@@ -161,16 +168,39 @@ NAME_TO_ID = {
     'mod_back': 264,
     'p_groups': 274,
     'area_inwards': 276,
+    'area_parent': 279,
     'deadzone': 282,
     'area_mirrored': 283,
+    'nonstick_y': 289,
     'effect_priority': 341,
+    'enter_channel': 343,
+    'scale_stick': 356,
     'disable_grid_snap': 370,
-    'preview_opacity': 456
+    'no_audio_scale': 372,
+    'material': 446,
+    'preview_opacity': 456,
+    'extra_sticky': 495,
+    'dont_boost_y': 496,
+    'no_particle': 507,
+    'dont_boost_x': 509,
+    'extended_collision': 511
 }
 
-BOOLEAN_IDS = [
-    4, 5, 11, 13, 14, 15, 16, 17, 34, 41, 42,
-    55, 56, 58, 59, 62, 64, 65, 66, 67, 70, 78,
-    81, 86, 87, 89, 93, 94, 96, 98, 99, 100, 102,
-    103, 104, 106
-]
+
+
+def print_missing():
+    prev = 0
+    missing = []
+    for v in sorted(NAME_TO_ID.values()):
+        if v - prev == 2:
+            print(v - 1)
+        elif v - prev == 3:
+            print(prev + 1)
+            print(v - 1)
+        elif v - prev > 3:
+            print(f'{prev+1} ... {v-1}')
+        prev = v
+    print(missing)
+
+if __name__ == '__main__':
+    print_missing()
