@@ -61,7 +61,9 @@ class Editor():
     # and initialises it ahead of GD.
     def load_default_level(self) -> None:
         try:
-            fr = open(os.getcwd() + '\\DefaultLevel', "r")
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            file_path = os.path.join(dir_path,"DefaultLevel")
+            fr = open(file_path, "r")
             data = fr.read()
             fr.close()
         except:

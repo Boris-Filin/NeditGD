@@ -2,6 +2,9 @@
 # https://github.com/github/gitignore/blob/main/Python.gitignore
 
 
+# My own level saves (too lazy to move for now)
+Level_instances/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
