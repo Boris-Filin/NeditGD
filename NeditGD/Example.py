@@ -12,5 +12,12 @@ if __name__ == '__main__':
     obj.hsv_enabled = 1
     obj.hsv = HSV(20, 1.3, 0.7, True)
     editor.add_object(obj)
+
+    editor.add_object(Object(
+        id=1268, #Spawn trigger
+        x=15,
+        y=15,
+        spawn_remap=[(1, 2), (3, 4)]
+    ))
     
     editor.save_changes()

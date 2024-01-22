@@ -124,7 +124,7 @@ NAME_TO_ID = {
     'gravity': 148,
     'scale_x_by': 150,
     'scale_y_by': 151,
-    'adv_rand_string': 152,
+    'group_probabilities': 152,
     'div_by_x': 153,
     'div_by_y': 154,
     'streak_additive': 159,
@@ -163,10 +163,11 @@ NAME_TO_ID = {
     'area_move_x': 237,
     'area_move_y': 239,
     'area_xy_mode': 241,
+    'area_easing': 242,
     'area_direction': 262,
     'mod_front': 263,
     'mod_back': 264,
-    'p_groups': 274,
+    'parent_groups': 274,
     'area_inwards': 276,
     'area_parent': 279,
     'deadzone': 282,
@@ -177,13 +178,16 @@ NAME_TO_ID = {
     'scale_stick': 356,
     'disable_grid_snap': 370,
     'no_audio_scale': 372,
+    'center_group_id': 395,
+    'spawn_remap': 442,
     'material': 446,
     'preview_opacity': 456,
     'extra_sticky': 495,
     'dont_boost_y': 496,
     'no_particle': 507,
     'dont_boost_x': 509,
-    'extended_collision': 511
+    'extended_collision': 511,
+    'dont_edit_area_parent': 539
 }
 
 

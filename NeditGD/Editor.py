@@ -41,6 +41,11 @@ class Editor():
         editor.load_level_data(robtop)
         return editor
     
+    # @classmethod
+    # def load_level_from_file(cls, path: str) -> Editor:
+    #     editor = Editor()
+
+    
     # Load the editor data
     def load_level_data(self, data: str = None) -> None:
         self.__root = read_gamesave_xml()
@@ -100,6 +105,7 @@ class Editor():
     def add_objects(self, objects: list, mark_as_scripted: bool=True):
         for obj in objects:
             self.add_object(obj, mark_as_scripted)
+        print(f'[Nedit]: Added {len(objects)} objects to editor.')
 
     # Get a string representing all objects in readable format
     def read_objects(self):
@@ -126,3 +132,16 @@ class Editor():
     def get_robtop_string(self) -> str:
         return get_level_save_string(self.objects, self.head)
 
+
+    # Get the highest group from the given list of objects
+    @staticmethod
+    def get_max_group(objects: list[Object]=None) -> int:
+        object_groups = set()
+        for obj in objects:
+            if obj.groups is None: continue
+            print(obj.groups)
+            object_groups.update(set(obj.groups))
+        object_groups.discard(9999)
+        if not object_groups: return 0
+        return max(object_groups)
+        

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from collections import UserDict
 from typing import Any
+from copy import deepcopy
 from Dictionaries.PropertyID import NAME_TO_ID
 import Properties
 
@@ -15,6 +16,16 @@ class Object(UserDict):
         super().__init__({1:1, 2:0, 3:0, 155:1})
         for k, v in kwargs.items():
             self.__setitem__(k, v)
+
+    # Sometimes you need to create multiple objects with slightly
+    # different parameters. The copied object is passed, along with
+    # the changed properties and their new values.
+    @classmethod
+    def copy(cls, original: Object, **kwargs) -> Object:
+        obj = deepcopy(original)
+        for k, v in kwargs.items():
+            obj[k] = v
+        return obj
 
     # When the object is accessed as a dictionary,
     # it automatically converts property aliases to integer ids
@@ -101,6 +112,20 @@ class Object(UserDict):
                 descr += f'{key_str}={v}, '
         descr = f'Object({descr[:-2]})'
         return descr
+
+
+
+
+def get_dist(x: float, y: float=None) -> tuple[float] | float:
+    if y is None:
+        return x * 30
+    return (x * 30, y * 30)
+
+
+def get_pos(x: float, y: float=None) -> tuple[float] | float:
+    if y is None:
+        return x * 30 + 15
+    return (x * 30 + 15, y * 30 + 15)
 
 
     

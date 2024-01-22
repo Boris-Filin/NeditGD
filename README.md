@@ -44,4 +44,4 @@ editor.add_objects(your_object_list, mark_as_scripted=False)
 ## Credits
 
 * Code written and hosted by Nemo2510
-* [Incidius](https://github.com/Incidius) aided in cataloguing
+* [Incidius](https://github.com/Incidius) aided in cataloguing; helped with a lot of testing and debugging.

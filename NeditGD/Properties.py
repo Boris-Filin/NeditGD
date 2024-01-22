@@ -5,8 +5,12 @@ from Dictionaries.PropertyHSV import HSV
 
 # Decode a property encoded RobTop's way
 def decode_property_pair(p_id: int, data: str) -> int | float | list[int]:
-    if p_id == NAME_TO_ID['groups']:
+    if p_id in [NAME_TO_ID['groups'], NAME_TO_ID['parent_groups']]:
         return decode_list(data)
+    
+    if p_id in {NAME_TO_ID['spawn_remap'],
+                NAME_TO_ID['group_probabilities']}:
+        return decode_pairs_list(data)
     
     if p_id == NAME_TO_ID['text']:
         return decode_text(data)
@@ -29,6 +33,8 @@ def decode_property_pair(p_id: int, data: str) -> int | float | list[int]:
 # Encode a property RobTop's way
 def encode_property(p_id: int, data: str) -> str:
     if type(data) is list:
+        if type(data[0]) is tuple:
+            return encode_pairs_list(p_id, data)
         return encode_list(p_id, data)
     
     if type(data) is str:
@@ -60,12 +66,23 @@ def encode_list(p_id: int, data: list[int]) -> str:
     str_list = '.'.join(map(str, data))
     return f'{p_id},{str_list},'
 
+def decode_pairs_list(data: str) -> list[tuple]:
+    l = decode_list(data)
+    return list(zip(l[::2], l[1::2]))
+
+def encode_pairs_list(p_id: int, data: list[tuple[int]]) -> str:
+    if not data:
+        return ''
+    
+    str_list = '.'.join([f'{p[0]}.{p[1]}' for p in data])
+    return f'{p_id},{str_list},'
+
 
 def decode_HSV(data: str) -> HSV:
     values = map(float, data.split('a'))
     return HSV(*values)
 
-def encode_HSV(p_id: int, hsv: HSV):
+def encode_HSV(p_id: int, hsv: HSV) -> str:
     hsv_enc = 'a'.join(map(str, hsv.get_property_list()))
     return f'{p_id},{hsv_enc},'
 
