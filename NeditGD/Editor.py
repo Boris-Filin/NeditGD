@@ -139,7 +139,6 @@ class Editor():
         object_groups = set()
         for obj in objects:
             if obj.groups is None: continue
-            print(obj.groups)
             object_groups.update(set(obj.groups))
         object_groups.discard(9999)
         if not object_groups: return 0

@@ -5,17 +5,20 @@ from Dictionaries.PropertyHSV import HSV
 
 # Decode a property encoded RobTop's way
 def decode_property_pair(p_id: int, data: str) -> int | float | list[int]:
-    if p_id in [NAME_TO_ID['groups'], NAME_TO_ID['parent_groups']]:
+    if p_id in {NAME_TO_ID['groups'],
+                NAME_TO_ID['parent_groups'],
+                NAME_TO_ID['events']}:
         return decode_list(data)
     
     if p_id in {NAME_TO_ID['spawn_remap'],
-                NAME_TO_ID['group_probabilities']}:
+                NAME_TO_ID['group_probabilities'],
+                NAME_TO_ID['sequence']}:
         return decode_pairs_list(data)
     
     if p_id == NAME_TO_ID['text']:
         return decode_text(data)
     
-    if p_id in (NAME_TO_ID['hsv'], NAME_TO_ID['color_2_hsv']):
+    if p_id in {NAME_TO_ID['hsv'], NAME_TO_ID['color_2_hsv']}:
         return decode_HSV(data)
     
     try: return int(data)

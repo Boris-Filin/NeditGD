@@ -179,6 +179,8 @@ NAME_TO_ID = {
     'disable_grid_snap': 370,
     'no_audio_scale': 372,
     'center_group_id': 395,
+    'events': 430,
+    'sequence': 435,
     'spawn_remap': 442,
     'material': 446,
     'preview_opacity': 456,
