@@ -1,6 +1,7 @@
 import base64
 from Dictionaries.PropertyID import NAME_TO_ID
 from Dictionaries.PropertyHSV import HSV
+from Dictionaries.ParticleEmitter import Emitter
 
 
 # Decode a property encoded RobTop's way
@@ -20,7 +21,15 @@ def decode_property_pair(p_id: int, data: str) -> int | float | list[int]:
     
     if p_id in {NAME_TO_ID['hsv'], NAME_TO_ID['color_2_hsv']}:
         return decode_HSV(data)
-    
+
+    if p_id == NAME_TO_ID['particle_setup']:
+        print(data)
+        em = Emitter.from_string(data)
+        print(em)
+        print(data)
+        print(em.get_property_list())
+        return Emitter.from_string(data)
+
     try: return int(data)
     except: pass
 

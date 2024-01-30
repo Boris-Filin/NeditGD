@@ -93,13 +93,20 @@ class Editor():
     # Mark it with group 9999
     def add_object(self, obj: dict, mark_as_scripted: bool=True):
         if mark_as_scripted:
-            groups = obj.groups
-            if groups is None:
-                obj.groups = [9999]
-            else:
-                groups.append(9999)
+            Editor.add_group(obj, 9999)
 
         self.objects.append(obj)
+
+    @staticmethod
+    def add_group_to_all(objects: list[Object], group: int) -> None:
+        for obj in objects: Editor.add_group(obj, group)
+
+    @staticmethod
+    def add_group(obj: Object, group: int) -> None:
+        if (groups := obj.groups) is None:
+            obj.groups = [9999]
+        else:
+            groups.append(9999)
 
     # Add multiple ojects to the editor
     def add_objects(self, objects: list, mark_as_scripted: bool=True):
