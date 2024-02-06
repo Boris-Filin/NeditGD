@@ -1,5 +1,5 @@
 
-
+# This class is put on hold until later updates
 class Emitter():
     def __init__(self):
         # Implement defaults later

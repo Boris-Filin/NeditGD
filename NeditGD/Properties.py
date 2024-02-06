@@ -19,7 +19,9 @@ def decode_property_pair(p_id: int, data: str) -> int | float | list[int]:
     if p_id == NAME_TO_ID['text']:
         return decode_text(data)
     
-    if p_id in {NAME_TO_ID['hsv'], NAME_TO_ID['color_2_hsv']}:
+    if p_id in {NAME_TO_ID['hsv'],
+                NAME_TO_ID['color_2_hsv'],
+                NAME_TO_ID['copied_color_hsv']}:
         return decode_HSV(data)
 
     if p_id == NAME_TO_ID['particle_setup']:
