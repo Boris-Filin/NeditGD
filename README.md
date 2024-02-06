@@ -44,4 +44,10 @@ editor.add_objects(your_object_list, mark_as_scripted=False)
 ## Credits
 
 * Code written and hosted by Nemo2510
-* [Incidius](https://github.com/Incidius) aided in cataloguing; helped with a lot of testing and debugging.
+
+### Property decoding and testing
+
+Huge thanks to people who helped me dig for property ids and debug Nedit:
+
+* [Incidius](https://github.com/Incidius)
+* Toastium
