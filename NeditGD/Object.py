@@ -30,7 +30,7 @@ class Object(UserDict):
     # When the object is accessed as a dictionary,
     # it automatically converts property aliases to integer ids
     def __setitem__(self, key: int | str, item: Any) -> None:
-        if type(key) is int:
+        if type(key) is int or key[:2] == '__':
             return self.data.__setitem__(key, item)
         if (_id := NAME_TO_ID.get(key)) is not None:
             return self.data.__setitem__(_id, item)
@@ -43,7 +43,7 @@ class Object(UserDict):
     # When the object is accessed as a dictionary,
     # it automatically converts property aliases to integer ids
     def __getitem__(self, key: int | str) -> Any:
-        if type(key) is int:
+        if type(key) is int or key[:2] == '__':
             return self.data.__getitem__(key)
         if (_id := NAME_TO_ID.get(key)) is not None:
             return self.data.__getitem__(_id)
@@ -61,6 +61,8 @@ class Object(UserDict):
     def __setattr__(self, __name: str, __value: Any) -> None:
         if (_id := NAME_TO_ID.get(__name)) is not None:
             return self.data.__setitem__(_id, __value)
+        elif __name[:2] == '__':
+            return self.data.__setitem__(__name, __value)
         try:
             _id = int(__name[1:])
             return self.data.__setitem__(_id, __value)
@@ -72,6 +74,8 @@ class Object(UserDict):
     def __getattr__(self, __name):
         if (_id := NAME_TO_ID.get(__name)) is not None:
             return self.data.get(_id)
+        elif __name[:2] == '__':
+            return self.data.get(__name)
         try:
             _id = int(__name[1:])
             return self.data.get(_id)
@@ -96,16 +100,21 @@ class Object(UserDict):
     def to_robtop(self) -> str:
         res = ''
         for (k, v) in self.data.items():
+            if type(k) is str and k[:2] == '__': continue
             res += Properties.encode_property(k, v)
         return res[:-1]
     
 
     # The string representation of the object uses property aliases,
     # which have to be deduced from property ids.
-    def __str__(self) -> str:
+    def __str__(self, include_tmp: bool=True) -> str:
         descr = ''
         for k, v in self.data.items():
-            key_str = Properties.get_property_name(k)
+            if type(k) is str and k[:2] == '__':
+                if not include_tmp: continue
+                key_str = k
+            else:
+                key_str = Properties.get_property_name(k)
             if type(v) is str:
                 descr += f'{key_str}=\"{v}\", '
             else:
@@ -136,7 +145,10 @@ if __name__ == '__main__':
     print(obj[1], obj['x'], obj['y'], obj['groups'])
     obj._4 = 1
     print(obj.x)
+    obj.__private = 42
+    print(obj)
+    print('>', obj['__private'])
     print(obj[4])
-    print(obj[5])
+    # print(obj[5])
     obj._57 = []
     print(obj.to_robtop())

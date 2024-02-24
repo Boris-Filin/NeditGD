@@ -47,7 +47,7 @@ def decode_property_pair(p_id: int, data: str) -> int | float | list[int]:
 # Encode a property RobTop's way
 def encode_property(p_id: int, data: str) -> str:
     if type(data) is list:
-        if type(data[0]) is tuple:
+        if data and type(data[0]) is tuple:
             return encode_pairs_list(p_id, data)
         return encode_list(p_id, data)
     
