@@ -24,13 +24,13 @@ def decode_property_pair(p_id: int, data: str) -> int | float | list[int]:
                 NAME_TO_ID['copied_color_hsv']}:
         return decode_HSV(data)
 
-    if p_id == NAME_TO_ID['particle_setup']:
-        print(data)
-        em = Emitter.from_string(data)
-        print(em)
-        print(data)
-        print(em.get_property_list())
-        return Emitter.from_string(data)
+    # if p_id == NAME_TO_ID['particle_setup']:
+    #     print(data)
+    #     em = Emitter.from_string(data)
+    #     print(em)
+    #     print(data)
+    #     print(em.get_property_list())
+    #     return Emitter.from_string(data)
 
     try: return int(data)
     except: pass
