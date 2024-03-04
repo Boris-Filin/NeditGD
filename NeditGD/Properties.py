@@ -24,7 +24,8 @@ def decode_property_pair(p_id: int, data: str) -> int | float | list[int]:
                 NAME_TO_ID['copied_color_hsv']}:
         return decode_HSV(data)
 
-    # if p_id == NAME_TO_ID['particle_setup']:
+    if p_id == NAME_TO_ID['particle_setup']:
+        return data
     #     print(data)
     #     em = Emitter.from_string(data)
     #     print(em)
@@ -50,6 +51,9 @@ def encode_property(p_id: int, data: str) -> str:
         if data and type(data[0]) is tuple:
             return encode_pairs_list(p_id, data)
         return encode_list(p_id, data)
+    
+    if p_id == NAME_TO_ID['particle_setup']:
+        return f'{p_id},{data},'
     
     if type(data) is str:
         return encode_text(p_id, data)
