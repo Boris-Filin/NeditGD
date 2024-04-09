@@ -41,10 +41,6 @@ class Editor():
         editor.load_level_data(robtop)
         return editor
     
-    # @classmethod
-    # def load_level_from_file(cls, path: str) -> Editor:
-    #     editor = Editor()
-
     
     # Load the editor data
     def load_level_data(self, data: str = None) -> None:
@@ -150,4 +146,39 @@ class Editor():
         object_groups.discard(9999)
         if not object_groups: return 0
         return max(object_groups)
+    
+
+    # Get the groups used in the level;
+    # Only counts groups with assigned objects. Triggers with unused
+    # targets are ignored.
+    @staticmethod
+    def get_used_groups(objects: list[Object]) -> list[int]:
+        used_groups = set() 
+        for obj in objects:
+            if obj.groups is None: continue
+            for group in obj.groups: used_groups.add(group)
+        return list(used_groups)
+        
+    
+    # Convert a list of values (groups, IDs, etc) to intervals.
+    # Slightly inefficient but works.
+    @staticmethod
+    def get_intervals(vals: list[int]) -> list[tuple[int]]:
+        if not vals: return None
+
+        intervals = []
+        interval_start = None
+            
+        for i in range(min(vals), max(vals) + 1):
+            used = i in vals
+            if interval_start is None:
+                if used:
+                    interval_start = i
+            else:
+                if not used:
+                    intervals.append((interval_start, i - 1))
+                    interval_start = None
+        return intervals
+
+
         
