@@ -230,6 +230,7 @@ NAME_TO_ID = {
     'no_particle': 507,
     'dont_boost_x': 509,
     'extended_collision': 511,
+    'event_target': 525,
     'dont_edit_area_parent': 539,
     'neg_op_1': 578,
     'neg_op_2': 579,
