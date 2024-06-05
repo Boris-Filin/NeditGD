@@ -184,6 +184,7 @@ NAME_TO_ID = {
     'no_audio_scale': 372,
     'follow_mode': 394,
     'center_group_id': 395,
+    'target_move_distance': 396,
     'rotation_dynamic': 397,
     'rotation_target': 401,
     'rotation_offset': 402,

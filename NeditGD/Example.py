@@ -6,8 +6,11 @@ from Dictionaries.PropertyHSV import HSV
 #   2. Make all the necessary changes (add/delete objects)
 #   3. Save your changes with editor.save_changes()
 
+emitter_id = -1
+
 if __name__ == '__main__':
     editor = Editor.load_current_level()
+
     obj = Object(id=1, x=75, y=-15, groups=[12, 42], scale=5)
     obj.hsv_enabled = 1
     obj.hsv = HSV(20, 1.3, 0.7, True)
