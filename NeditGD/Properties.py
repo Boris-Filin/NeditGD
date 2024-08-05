@@ -75,6 +75,7 @@ def get_property_name(p_id: int):
 
 # Decode a list encoded RobTop's way
 def decode_list(data: str) -> list[int]:
+    if not data: return []
     return list(map(int, data.split('.')))
 
 # Encode a list RobTop's way
