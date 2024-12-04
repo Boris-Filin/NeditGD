@@ -3,6 +3,7 @@ from collections import UserDict
 from typing import Any
 from copy import deepcopy
 from Dictionaries.PropertyID import NAME_TO_ID
+from Dictionaries.IDNames import oid_from_alias, oid_to_alias
 import Properties
 
 # A class that represents a Geometry Dash object
@@ -31,14 +32,23 @@ class Object(UserDict):
     # it automatically converts property aliases to integer ids
     def __setitem__(self, key: int | str, item: Any) -> None:
         if type(key) is int or key[:2] == '__':
-            return self.data.__setitem__(key, item)
+            return self.set_item_int_key(key, item)
         if (_id := NAME_TO_ID.get(key)) is not None:
-            return self.data.__setitem__(_id, item)
+            return self.set_item_int_key(_id, item)
         try:
             _id = int(key[1:])
-            return self.data.__setitem__(_id, item)
+            return self.set_item_int_key(_id, item)
         except: pass
         raise KeyError(f'Objects have no property called \'{key}\'.')
+    
+
+    # Set an item given an integer key;
+    # Change oid aliases to int oids
+    def set_item_int_key(self, key: int, item: Any) -> None:
+        if key == 1 and type(item) is str:
+            item = oid_from_alias(item)
+        return self.data.__setitem__(key, item)
+
     
     # When the object is accessed as a dictionary,
     # it automatically converts property aliases to integer ids
@@ -60,6 +70,8 @@ class Object(UserDict):
     # converted to integer id and fetched from the object dictionary.
     def __setattr__(self, __name: str, __value: Any) -> None:
         if (_id := NAME_TO_ID.get(__name)) is not None:
+            if _id == 1 and type(__value) is str:
+                __value = oid_from_alias(__value)
             return self.data.__setitem__(_id, __value)
         elif __name[:2] == '__':
             return self.data.__setitem__(__name, __value)
@@ -81,7 +93,6 @@ class Object(UserDict):
             return self.data.get(_id)
         except:
             return super().__getattr__(__name)
-    
 
 
     # When loading from a game save, every object is
@@ -107,7 +118,7 @@ class Object(UserDict):
 
     # The string representation of the object uses property aliases,
     # which have to be deduced from property ids.
-    def __str__(self, include_tmp: bool=True) -> str:
+    def __str__(self, include_tmp: bool=True, oid_alias=False) -> str:
         descr = ''
         for k, v in self.data.items():
             if type(k) is str and k[:2] == '__':
@@ -115,13 +126,16 @@ class Object(UserDict):
                 key_str = k
             else:
                 key_str = Properties.get_property_name(k)
+            
+            if oid_alias and k == 1:
+                v = oid_to_alias(v)
+
             if type(v) is str:
                 descr += f'{key_str}=\"{v}\", '
             else:
                 descr += f'{key_str}={v}, '
         descr = f'Object({descr[:-2]})'
         return descr
-
 
 
 
