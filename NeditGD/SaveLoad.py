@@ -3,8 +3,8 @@ import struct
 import base64, gzip, zlib
 import xml.etree.ElementTree as ET
 
-# from Properties import *
-from Object import Object
+from NeditGD.object_gd import Object
+
 
 SAVE_FILE = "CCLocalLevels.dat"
 PATH_TO_SAVE = os.getenv("localappdata") + "\\GeometryDash\\"

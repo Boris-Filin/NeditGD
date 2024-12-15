@@ -2,9 +2,9 @@ from __future__ import annotations
 from collections import UserDict
 from typing import Any
 from copy import deepcopy
-from Dictionaries.PropertyID import NAME_TO_ID
-from Dictionaries.IDNames import oid_from_alias, oid_to_alias
-import Properties
+from NeditGD.Dictionaries.PropertyID import NAME_TO_ID
+from NeditGD.Dictionaries.IDNames import oid_from_alias, oid_to_alias
+import NeditGD.properties as properties
 
 # A class that represents a Geometry Dash object
 # as a dictionary containing all of its properties.
@@ -104,7 +104,7 @@ class Object(UserDict):
         encoded_pairs = [(arr_obj[i], arr_obj[i+1])
                         for i in range(0, len(arr_obj), 2)]
         for (k, v) in encoded_pairs:
-            obj[f'_{k}'] = Properties.decode_property_pair(int(k), v)
+            obj[f'_{k}'] = properties.decode_property_pair(int(k), v)
         return Object(**obj)
     
     # To save an object, it is converted to RobTop's string encoding.
@@ -112,7 +112,7 @@ class Object(UserDict):
         res = ''
         for (k, v) in self.data.items():
             if type(k) is str and k[:2] == '__': continue
-            res += Properties.encode_property(k, v)
+            res += properties.encode_property(k, v)
         return res[:-1]
     
 
@@ -125,7 +125,7 @@ class Object(UserDict):
                 if not include_tmp: continue
                 key_str = k
             else:
-                key_str = Properties.get_property_name(k)
+                key_str = properties.get_property_name(k)
             
             if oid_alias and k == 1:
                 v = oid_to_alias(v)

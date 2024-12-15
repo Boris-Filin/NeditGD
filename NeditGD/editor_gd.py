@@ -1,6 +1,6 @@
 from __future__ import annotations
-from SaveLoad import *
-from Object import Object
+from NeditGD.saveload import *
+from NeditGD import Object
 
 
 WATERMARK_TEXT = [

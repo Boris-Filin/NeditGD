@@ -1,4 +1,4 @@
-from Editor import Editor
+from NeditGD import Editor
 import sys
 
 def read_objects(editor: Editor):

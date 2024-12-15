@@ -1,5 +1,4 @@
-from Editor import Editor, Object
-from Dictionaries.PropertyHSV import HSV
+from NeditGD import Editor, Object, HSV
 
 # This is an example of how to use the library:
 #   1. Load the most recent level using Editor.load_current_level()
