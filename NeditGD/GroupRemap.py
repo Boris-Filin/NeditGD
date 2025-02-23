@@ -22,6 +22,16 @@ def remap_groups(objects: list[Object], remap: dict[int, int],
                 new_groups.append(new_group)
             new_obj.groups = new_groups
         
+        if (parent_groups := obj.parent_groups) is not None:
+            new_parent_groups = []
+            for group in parent_groups:
+                new_group = group
+                if group in remap:
+                    changed = True
+                    new_group = remap[group]
+                new_parent_groups.append(new_group)
+            new_obj.parent_groups = new_parent_groups
+        
         if obj.id == 3619:
             new_objects.append(new_obj)            
             continue
@@ -67,9 +77,17 @@ def shift_groups(objects: list[Object],
     return remap_group_lists(objects, old, new)
 
 
-if __name__ == '__main__':
+def tmp() -> None:
     editor = Editor.load_current_level(False)
-    editor.objects = shift_groups(editor.objects, range(100, 9999), 200)
+    editor.objects = shift_groups(editor.objects, range(500, 510), -10)
+    editor.objects = shift_groups(editor.objects, range(520, 530), -50)
+    editor.objects = shift_groups(editor.objects, range(400, 500), 100)
+    editor.objects = shift_groups(editor.objects, range(400, 900), 100)
+
+    editor.save_changes()
+
+if __name__ == '__main__':
+    tmp()
 
     # editor.objects = shift_groups(editor.objects, range(30, 36), 72)
     # editor.objects = remap_group (editor.objects, 20, 101)
@@ -85,6 +103,3 @@ if __name__ == '__main__':
 
     # editor.objects = remap_group (editor.objects, 21, 117)
     # editor.objects = shift_groups(editor.objects, range(300, 320), -90)
-
-
-    editor.save_changes()

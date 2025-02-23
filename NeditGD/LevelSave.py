@@ -23,7 +23,7 @@ def load_from_file(name: str) -> str:
 
 # Load the current level and save its contents to a text file
 def record_current_level(name: str, msg: str) -> None:
-    editor = Editor.load_current_level()
+    editor = Editor.load_current_level(False)
     data = editor.get_robtop_string()
     save_to_file(name, msg + '#' + data)
 
@@ -32,6 +32,7 @@ def overload_current_level(name: str) -> None:
     msg, data = load_from_file(name).split('#')
     print(f'[Nedit]: Save description: \"{msg}\"')
     editor = Editor.load_from_robtop(data)
+    print(len(editor.objects))
     editor.save_changes()
 
 # Read the message of a savefile
