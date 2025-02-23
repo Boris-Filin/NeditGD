@@ -1,6 +1,6 @@
 from __future__ import annotations
-from SaveLoad import *
-from Object import Object
+from NeditGD.saveload import *
+from NeditGD import Object
 
 
 WATERMARK_TEXT = [
@@ -111,10 +111,10 @@ class Editor():
         print(f'[Nedit]: Added {len(objects)} objects to editor.')
 
     # Get a string representing all objects in readable format
-    def read_objects(self):
+    def read_objects(self, oid_alias: bool=False):
         res = ''
         for obj in self.objects:
-            res += str(obj) + '\n'
+            res += obj.__str__(oid_alias=oid_alias) + '\n'
         return res
 
     # Write the editor object list to the current level file

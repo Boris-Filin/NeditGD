@@ -4,7 +4,17 @@
 
 ## Installation
 
- While Nedit is in early stages of development, you will need to download the code and import the modules manually. The main ones are Editor and Object. For more advanced save file interaction, import SaveLoad.
+### Via Pip
+
+ Nedit is now on [PyPi](https://pypi.org/project/NeditGD/)! After [downloading python](https://www.python.org/downloads/) and [installing Pip](https://pip.pypa.io/en/stable/installation/), run the following command in your terminal of choice:
+`pip install NeditGD`
+ Which will install Nedit as a package. After that, you can import the main features from Nedit at the start of your file:
+`from NeditGD import Object, Editor`
+
+### Manual via GitHub
+
+ If you would like to interact with the source code directly, you can download it from the [GitHub page of Nedit](https://github.com/Boris-Filin/NeditGD).
+ Note that Git will be updated more frequently with experimental changes.
 
 ## Loading the level editor
 

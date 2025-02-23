@@ -1,5 +1,5 @@
 import os
-from Editor import Editor
+from NeditGD import Editor
 
 
 SUBDIRECTORY = '\\Level_instances\\'

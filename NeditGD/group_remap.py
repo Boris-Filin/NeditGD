@@ -1,6 +1,4 @@
-from Editor import Editor
-from Object import Object
-import Properties
+from NeditGD import Editor, Object
 
 
 def remap_groups(objects: list[Object], remap: dict[int, int],

@@ -1,7 +1,7 @@
 import base64
-from Dictionaries.PropertyID import NAME_TO_ID
-from Dictionaries.PropertyHSV import HSV
-from Dictionaries.ParticleEmitter import Emitter
+from NeditGD.Dictionaries.PropertyID import NAME_TO_ID
+from NeditGD.Dictionaries.PropertyHSV import HSV
+from NeditGD.Dictionaries.ParticleEmitter import Emitter
 
 
 # Decode a property encoded RobTop's way

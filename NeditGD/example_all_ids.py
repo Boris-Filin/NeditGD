@@ -1,5 +1,5 @@
-from Editor import Editor, Object
-from Dictionaries.PropertyHSV import HSV
+from NeditGD import Editor, Object, HSV
+
 
 # This example creates a board of all available objects in the
 # game along with their IDs.
