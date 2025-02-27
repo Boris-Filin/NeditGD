@@ -16,11 +16,13 @@ WATERMARK_TEXT = [
 # The class that stores all loaded objects and handles
 # interactions with the SaveLoad system for the user
 class Editor():
-    __root = None
-    __level_node = None
-    __level_string = None
-    head = None
-    objects = None
+    def __init__(self):
+        self.__root = None
+        self.__level_node = None
+        self.__level_string = None
+        self.__markers = None
+        self.head = None
+        self.objects = None
 
     # Create an editor object that automatically loads
     # the contents of the current level
@@ -30,6 +32,7 @@ class Editor():
         editor.load_level_data()
         if remove_scripted:
             editor.remove_scripted_objects()
+        editor.refresh_markers()
         return editor
     
 
@@ -41,7 +44,11 @@ class Editor():
         editor.load_level_data(robtop)
         return editor
     
-    
+    # Refresh the markers in the level
+    def refresh_markers(self):
+        from Nextra.marker_loader import MarkerLoader
+        self.__markers = MarkerLoader(self)
+   
     # Load the editor data
     def load_level_data(self, data: str = None) -> None:
         self.__root = read_gamesave_xml()
@@ -185,15 +192,24 @@ class Editor():
     # Extra methods
     # -===========-
 
+    # Get the used groups in an easy-to-interact way
     def get_used_group_pool(self):
         from Nextra.group_pool import GroupPool
         return GroupPool(Editor.get_used_groups(self.objects))
     
+    # Check if a given group pool overlaps with the editor's groups
     def validate_group_pool(self, group_pool):
         group_pool = self.get_used_group_pool()
         for group in self.get_used_groups():
             if group in group_pool:
                 return False
         return True
+    
+    # Get the position of the marker with the given name
+    def get_marker_position(self, name):
+        return self.__markers.read_position(name)
 
+    # Get the groups of the marker with the given name
+    def get_marker_groups(self, name):
+        return self.__markers.read_groups(name)
         

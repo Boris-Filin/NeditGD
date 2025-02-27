@@ -3,6 +3,7 @@ OBJECT_IDS = {
     'spike': 8,
     'col_t': 899,
     'move_t' : 901,
+    'text': 914,
     'stop_t' : 1616,
     'pulse_t' : 1006,
     'alpha_t' : 1007,
