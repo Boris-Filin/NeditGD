@@ -179,6 +179,21 @@ class Editor():
                     intervals.append((interval_start, i - 1))
                     interval_start = None
         return intervals
+    
 
+    # -===========-
+    # Extra methods
+    # -===========-
+
+    def get_used_group_pool(self):
+        from Nextra.group_pool import GroupPool
+        return GroupPool(Editor.get_used_groups(self.objects))
+    
+    def validate_group_pool(self, group_pool):
+        group_pool = self.get_used_group_pool()
+        for group in self.get_used_groups():
+            if group in group_pool:
+                return False
+        return True
 
         
