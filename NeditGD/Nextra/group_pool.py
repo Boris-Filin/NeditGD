@@ -59,6 +59,9 @@ class GroupPool():
         gp -= to_remove
         return gp
     
+    def remove(self, to_remove: int):
+        self.add_all([to_remove])
+    
 
     # Add all groups from an iterable.
     # Supports + and += syntax.
@@ -77,6 +80,9 @@ class GroupPool():
         gp = GroupPool(self.values)
         gp += to_add
         return gp
+    
+    def add(self, to_add: int):
+        self.add_all([to_add])
     
 
     def get_min(self) -> int:
@@ -162,3 +168,7 @@ if __name__ == '__main__':
     print(gp.idx)
     print(gp.values[gp.idx])
     print(gp)
+
+    print(7)
+    print(12 in gp)
+    print(42 in gp)
