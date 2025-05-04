@@ -1,8 +1,11 @@
+from __future__ import annotations
 from collections.abc import Iterable, Callable
 from bisect import bisect_left
 
 
 class GroupPool():
+    left = 1
+    right = 9999
     
     def __init__(self, groups: Iterable[int]):
         self.values = list(groups)
@@ -131,6 +134,22 @@ class GroupPool():
     
     def reset(self):
         self.idx = 0
+
+    # -===========-
+    # CUSTOM POOLS
+    # -===========-
+
+    @classmethod
+    def since(cls, start: int) -> GroupPool:
+        vals = range(start, GroupPool.right)
+        return cls(vals)
+
+    @classmethod    
+    def reverse(cls, start: int) -> GroupPool:
+        vals = range(start, GroupPool.left, -1)
+        return cls(vals)
+
+
 
 
 if __name__ == '__main__':
