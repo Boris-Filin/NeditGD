@@ -1,6 +1,7 @@
 from __future__ import annotations
 from collections import UserDict
-from typing import Any
+from typing import Any, Iterable
+from numbers import Number
 from copy import deepcopy
 from NeditGD.Dictionaries.PropertyID import NAME_TO_ID
 from NeditGD.Dictionaries.IDNames import oid_from_alias, oid_to_alias
@@ -136,6 +137,36 @@ class Object(UserDict):
                 descr += f'{key_str}={v}, '
         descr = f'Object({descr[:-2]})'
         return descr
+
+    # -===============-
+    # QoL functionality
+    # -===============-
+    
+    def move(self, x: Number|Iterable, y: Number=None):
+        if y is None:
+            x, y = x
+        self.x += x
+        self.y += y
+        return self
+    
+    def move_to(self, x: Number|Iterable, y: Number=None):
+        if y is None:
+            x, y = x
+        self.x = x
+        self.y = y
+        return self
+    
+    def add_group(self, group):
+        if self.groups is None:
+            self.groups = []
+        self.groups.append(group)
+        return self
+    
+    def to_layer(self, layer: int):
+        self.editor_layer_1 = layer
+        return self
+
+
 
 
 
