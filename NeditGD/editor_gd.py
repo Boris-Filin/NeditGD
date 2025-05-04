@@ -16,6 +16,8 @@ WATERMARK_TEXT = [
 # The class that stores all loaded objects and handles
 # interactions with the SaveLoad system for the user
 class Editor():
+    default_layer = 20
+
     def __init__(self):
         self.__root = None
         self.__level_node = None
@@ -46,7 +48,7 @@ class Editor():
     
     # Refresh the markers in the level
     def refresh_markers(self):
-        from Nextra.marker_loader import MarkerLoader
+        from NeditGD.Nextra.marker_loader import MarkerLoader
         self.__markers = MarkerLoader(self)
    
     # Load the editor data
@@ -97,6 +99,8 @@ class Editor():
     def add_object(self, obj: dict, mark_as_scripted: bool=True):
         if mark_as_scripted:
             Editor.add_group(obj, 9999)
+        if obj.editor_layer_1 is None:
+            obj.editor_layer_1 = Editor.default_layer
 
         self.objects.append(obj)
 
@@ -194,7 +198,7 @@ class Editor():
 
     # Get the used groups in an easy-to-interact way
     def get_used_group_pool(self):
-        from Nextra.group_pool import GroupPool
+        from NeditGD.Nextra.group_pool import GroupPool
         return GroupPool(Editor.get_used_groups(self.objects))
     
     # Check if a given group pool overlaps with the editor's groups
@@ -205,6 +209,11 @@ class Editor():
                 return False
         return True
     
+
+    # -=====-
+    # Markers
+    # -=====-
+    
     # Get the position of the marker with the given name
     def get_marker_position(self, name):
         return self.__markers.read_position(name)
@@ -212,4 +221,16 @@ class Editor():
     # Get the groups of the marker with the given name
     def get_marker_groups(self, name):
         return self.__markers.read_groups(name)
+    
+    # Get the first group of the marker
+    def get_marker_group1(self, name):
+        return self.get_marker_groups(name)[0]
+    
+    # Get the value of the marker with this prename
+    def get_marker_var(self, name):
+        return self.__markers.read_var(name)
+    
+    # Get the int value of the marker with this prename
+    def get_marker_var_int(self, name):
+        return self.__markers.read_var_int(name)
         
