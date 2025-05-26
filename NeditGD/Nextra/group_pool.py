@@ -115,7 +115,7 @@ class GroupPool():
 
 
     def is_empty(self) -> bool:
-        return len(self.values)
+        return len(self.values) == 0
     
     def has_free_groups(self) -> bool:
         return self.idx < len(self)
