@@ -25,11 +25,12 @@ ITEM_FIELDS = [
     'block_b'
 ]
 
-COLOR_FIELDS = [
-    'target'
-]
-
 COLLISION_FIELDS = [
     'item_id',
     'block_b'
 ]
+
+LOGIC_FIELDS = \
+    GROUP_FIELDS + \
+    ITEM_FIELDS + \
+    COLLISION_FIELDS

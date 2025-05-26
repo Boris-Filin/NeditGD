@@ -236,6 +236,27 @@ NAME_TO_ID = {
     'neg_op_2': 579,
 }
 
+ALIASES = {
+    'remap': 'spawn_remap',
+    'op_1': 'num_op_1',
+    'op_2': 'num_op_2',
+    'op_3': 'num_op_3',
+    'sign_op_1': 'neg_op_1',
+    'sign_op_2': 'neg_op_2',
+    'cmp_op': 'num_op_3',
+    'item_2': 'block_b',
+    'item': 'item_id',
+}
+
+
+def get_property_id(name: str) -> int:
+    if name in ALIASES:
+        name = ALIASES[name]
+    return NAME_TO_ID.get(name)
+
+def is_alias(name: str, to: str) -> bool:
+    return ALIASES.get(name) == to or \
+        ALIASES.get(name) == ALIASES.get(to)
 
 
 def print_missing():
