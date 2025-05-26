@@ -4,6 +4,8 @@
 
 # My own level saves (too lazy to move for now)
 Level_instances/
+# Prototypes
+Maybe/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
