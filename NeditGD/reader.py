@@ -34,13 +34,22 @@ def main():
         default=False, required=False)
     parser.add_argument(
         '-g', '--group', type=int)
+    parser.add_argument(
+        '-l', '--live',
+        action='store_true',
+        default=False, required=False)
+    
     
     
     
     args = parser.parse_args()
 
-    edt = Editor.load_current_level(
-        remove_scripted=not args.scripted)
+    if args.live:
+        edt = Editor.load_live_editor(
+            remove_scripted=not args.scripted)
+    else:
+        edt = Editor.load_current_level(
+            remove_scripted=not args.scripted)
 
     if args.group is not None:
         edt.objects = [o for o in edt.objects \

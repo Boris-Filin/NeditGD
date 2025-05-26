@@ -3,7 +3,7 @@ from collections import UserDict
 from typing import Any, Iterable
 from numbers import Number
 from copy import deepcopy
-from NeditGD.Dictionaries.PropertyID import NAME_TO_ID
+from NeditGD.Dictionaries.PropertyID import get_property_id
 from NeditGD.Dictionaries.IDNames import oid_from_alias, oid_to_alias
 import NeditGD.properties as properties
 
@@ -12,6 +12,9 @@ import NeditGD.properties as properties
 # Each property can be accesed either with its property id
 # (decided by RobTop), or by a string alias (assigned by Nedit).
 class Object(UserDict):
+
+    _aliases = {}
+
     # The object can be initialised with some properties;
     # id, x, y, and _155 have to be set by default.
     def __init__(self, **kwargs):
@@ -32,9 +35,10 @@ class Object(UserDict):
     # When the object is accessed as a dictionary,
     # it automatically converts property aliases to integer ids
     def __setitem__(self, key: int | str, item: Any) -> None:
-        if type(key) is int or key[:2] == '__':
+        if type(key) is int or \
+            Object.is_tmp_key(key):
             return self.set_item_int_key(key, item)
-        if (_id := NAME_TO_ID.get(key)) is not None:
+        if (_id := get_property_id(key)) is not None:
             return self.set_item_int_key(_id, item)
         try:
             _id = int(key[1:])
@@ -54,9 +58,10 @@ class Object(UserDict):
     # When the object is accessed as a dictionary,
     # it automatically converts property aliases to integer ids
     def __getitem__(self, key: int | str) -> Any:
-        if type(key) is int or key[:2] == '__':
+        if type(key) is int or \
+            Object.is_tmp_key(key):
             return self.data.__getitem__(key)
-        if (_id := NAME_TO_ID.get(key)) is not None:
+        if (_id := get_property_id(key)) is not None:
             return self.data.__getitem__(_id)
         try:
             _id = int(key[1:])
@@ -70,11 +75,11 @@ class Object(UserDict):
     # When a property is accessed as a Python property, it is
     # converted to integer id and fetched from the object dictionary.
     def __setattr__(self, __name: str, __value: Any) -> None:
-        if (_id := NAME_TO_ID.get(__name)) is not None:
+        if (_id := get_property_id(__name)) is not None:
             if _id == 1 and type(__value) is str:
                 __value = oid_from_alias(__value)
             return self.data.__setitem__(_id, __value)
-        elif __name[:2] == '__':
+        elif Object.is_tmp_key(__name):
             return self.data.__setitem__(__name, __value)
         try:
             _id = int(__name[1:])
@@ -85,9 +90,9 @@ class Object(UserDict):
     # When a property is accessed as a Python property, it is
     # converted to integer id and fetched from the object dictionary.
     def __getattr__(self, __name):
-        if (_id := NAME_TO_ID.get(__name)) is not None:
+        if (_id := get_property_id(__name)) is not None:
             return self.data.get(_id)
-        elif __name[:2] == '__':
+        elif Object.is_tmp_key(__name):
             return self.data.get(__name)
         try:
             _id = int(__name[1:])
@@ -112,9 +117,13 @@ class Object(UserDict):
     def to_robtop(self) -> str:
         res = ''
         for (k, v) in self.data.items():
-            if type(k) is str and k[:2] == '__': continue
+            if Object.is_tmp_key(k): continue
             res += properties.encode_property(k, v)
         return res[:-1]
+
+    @staticmethod
+    def list_to_robtop(objects: Iterable[Object]):
+        return ';'.join(obj.to_robtop() for obj in objects)
     
 
     # The string representation of the object uses property aliases,
@@ -122,7 +131,7 @@ class Object(UserDict):
     def __str__(self, include_tmp: bool=True, oid_alias=False) -> str:
         descr = ''
         for k, v in self.data.items():
-            if type(k) is str and k[:2] == '__':
+            if Object.is_tmp_key(k):
                 if not include_tmp: continue
                 key_str = k
             else:
@@ -135,8 +144,15 @@ class Object(UserDict):
                 descr += f'{key_str}=\"{v}\", '
             else:
                 descr += f'{key_str}={v}, '
-        descr = f'Object({descr[:-2]})'
+        descr = f'{type(self).__name__}({descr[:-2]})'
         return descr
+    
+    @staticmethod
+    def is_tmp_key(k: str):
+
+        return type(k) is str and \
+               len(k) > 2 and \
+               k[:1] + k[-1:] == '__'
 
     # -===============-
     # QoL functionality
@@ -190,10 +206,18 @@ if __name__ == '__main__':
     print(obj[1], obj['x'], obj['y'], obj['groups'])
     obj._4 = 1
     print(obj.x)
-    obj.__private = 42
+    print(obj._private_)
+    obj._private_ = 42
     print(obj)
-    print('>', obj['__private'])
+    print('>', obj['_private_'])
+    print('>', obj._private_)
     print(obj[4])
     # print(obj[5])
     obj._57 = []
     print(obj.to_robtop())
+
+    # obj._42 = 'trace'
+    obj['_42'] = 'trace'
+
+    print(obj)
+    print(obj._aliases)
