@@ -5,6 +5,9 @@ from NeditGD import Object
 import json
 from websocket import create_connection
 from typing import List
+from enum import Enum
+import math
+from dataclasses import dataclass
 
 
 WATERMARK_TEXT = [
@@ -17,6 +20,70 @@ WATERMARK_TEXT = [
 PREFIX = '[Nedit]:'
 
 PAD = ' ' * len(PREFIX)
+
+@dataclass
+class ScriptedMarker:
+    ...
+
+    def is_scripted(self, obj: Object):
+        ...
+    
+    def set_scripted(self, obj: Object):
+        ...
+
+@dataclass
+class ScriptedGroup:
+    group: int = 9999
+
+    def is_scripted(self, obj: Object):
+        return obj.groups and self.group in obj.groups
+
+    def set_scripted(self, obj: Object):
+        if obj.groups is None:
+            obj.groups = [self.group]
+        elif len(obj.groups) < 10:
+            obj.groups.append(self.group)
+        else:
+            raise ValueError(f"Object {obj} has 10 or more groups")
+
+@dataclass
+class ScriptedLayer:
+    layer: int = 999
+
+    def is_scripted(self, obj: Object):
+        return obj.editor_layer_1 and obj.editor_layer_1 == self.layer
+
+    def set_scripted(self, obj: Object):
+        obj.editor_layer_1 = self.layer
+
+
+@dataclass
+class ScriptedGroupRange:
+    min_group: int = 9900
+    max_group: int = 9999
+
+    __idx: int = 0
+
+    def is_scripted(self, obj: Object):
+        return any(g in self for g in obj.groups or [])
+
+    def set_scripted(self, obj: Object):
+        g = self.min_group + self.__idx % (self.max_group - self.min_group)
+        g = int(g) # Just to be sure
+        if obj.groups is None:
+            obj.groups = [g]
+        elif len(obj.groups) < 10:
+            obj.groups.append(g)
+        else:
+            raise ValueError(f"Object {obj} has 10 or more groups")
+        self.__idx += 1
+
+    def __contains__(self, item: int):
+        return self.min_group <= item <= self.max_group
+
+    @property
+    def groups(self):
+        return range(self.min_group, self.max_group + 1)
 
 # The class that stores all loaded objects and handles
 # interactions with the SaveLoad system for the user
@@ -40,6 +107,13 @@ class Editor():
         if live_edit:
             self.init_socket()
 
+        self.scripted_marker = ScriptedGroup(9999)
+        self.send_batching = 1_000
+
+        self.silent = False
+        self.live_rebuild_on_save = False
+
+
 
     # -==========-
     # LIVE EDITING
@@ -62,6 +136,7 @@ class Editor():
             raise ConnectionError('[Nedit/WSL]: Level could not be read')
         data = raw['response']
         self.objects = read_level_objects(data)
+        self.head = read_level_head(data)
 
     def socket_remove_group(self, group: int=9999):
         packet = {
@@ -69,17 +144,43 @@ class Editor():
             "group": group
         }
         self.socket.send(json.dumps(packet))
+        self.socket.recv()
 
     def socket_save_objects(self):
-        scripted = self.get_scripted_objects()
-        data = Object.list_to_robtop(scripted)
+        # scripted = self.get_scripted_objects()
+        # data = Object.list_to_robtop(scripted)
 
-        packet = {
-            "action": "ADD_OBJECTS",
-            "objects": data
-        }
-        self.socket.send(json.dumps(packet))
-    
+        n_objects = len(self.objects)
+        if self.send_batching and n_objects > self.send_batching:
+            if self.live_rebuild_on_save:
+                packet = {
+                    "action": "REPLACE_LEVEL_STRING",
+                    "levelString": self.head + ';'
+                }
+                self.socket.send(json.dumps(packet))
+                self.socket.recv()
+            for i in range(0, n_objects, self.send_batching):
+                print(f"\r  [{i}/{n_objects}] Sent.", end='')
+                batch = self.objects[i : i+self.send_batching]
+                if not self.live_rebuild_on_save:
+                    batch = [obj for obj in batch 
+                            if self.scripted_marker.is_scripted(obj)]
+                if batch:
+                    packet = {
+                        "action": "ADD_OBJECTS",
+                        "objects": Object.list_to_robtop(batch)
+                    }
+                    self.socket.send(json.dumps(packet))
+                    self.socket.recv()
+            print(f"\r  [{n_objects}/{n_objects}] Sent.")
+        else:
+            packet = {
+                "action": "REPLACE_LEVEL_STRING",
+                "levelString": self.get_robtop_string()
+            }
+            self.socket.send(json.dumps(packet))
+            self.socket.recv()
+
     @classmethod
     def load_live_editor(cls, load_existing: bool=True, remove_scripted: bool=True):
         editor = Editor(live_edit=True)
@@ -89,8 +190,9 @@ class Editor():
         else:
             editor.objects = []
         if remove_scripted:
-            editor.socket_remove_group(9999)
+            # editor.socket_remove_group(9999)
             editor.remove_scripted_objects()
+        editor.refresh_markers()
         return editor
     
 
@@ -153,6 +255,11 @@ class Editor():
         editor.load_level_data(robtop)
         return editor
     
+    
+    # -==================-
+    # EDITOR FUNCTIONALITY
+    # -==================-
+    
     @classmethod
     def get_last(_):
         if Editor.__last is None:
@@ -164,23 +271,37 @@ class Editor():
         from NeditGD.Nextra.marker_loader import MarkerLoader
         self.__markers = MarkerLoader(self)
    
+   
+    def get_objects_with_group(self, group: int):
+        return [obj for obj in self.objects \
+                if obj.groups is not None and \
+                    group in obj.groups]
+
 
     # Remove the previously scripted objects;
     # It is assumed that they are marked with group 9999
-    def remove_scripted_objects(self) -> None:
+    def remove_scripted_objects(self, scripted_markers: List[ScriptedMarker] = None) -> None:
+        if scripted_markers is None:
+            scripted_markers = [self.scripted_marker]
         res = []
         for obj in self.objects:
-            groups = obj.groups
-            if groups is None or not 9999 in groups:
+            if all(not marker.is_scripted(obj) for marker in scripted_markers):
                 res.append(obj)
+        for marker in scripted_markers:
+            if isinstance(marker, ScriptedGroup):
+                self.socket_remove_group(marker.group)
+            elif isinstance(marker, ScriptedGroupRange):
+                for group in marker.groups:
+                    self.socket_remove_group(group)
         self.objects = res
         self.loaded_obj_count = len(self.objects)
 
-    def get_scripted_objects(self) -> List[Object]:
+    def get_scripted_objects(self, scripted_markers: List[ScriptedMarker] = None) -> List[Object]:
+        if scripted_markers is None:
+            scripted_markers = [self.scripted_marker]
         scripted = []
         for obj in self.objects:
-            groups = obj.groups
-            if groups is not None and 9999 in groups:
+            if any(marker.is_scripted(obj) for marker in scripted_markers):
                 scripted.append(obj)
         return scripted
 
@@ -188,7 +309,7 @@ class Editor():
     # Mark it with group 9999
     def add_object(self, obj: dict, mark_as_scripted: bool=True):
         if mark_as_scripted:
-            Editor.add_group(obj, 9999)
+            self.scripted_marker.set_scripted(obj)
         if obj.editor_layer_1 is None:
             obj.editor_layer_1 = Editor.default_layer
 
@@ -212,7 +333,8 @@ class Editor():
         message = f'\n{PAD}^ {message}' if message else ''
         for obj in objects:
             self.add_object(obj, mark_as_scripted)
-        print(PREFIX, f'Added {len(objects)} objects to editor.{message}')
+        if not self.silent:
+            print(PREFIX, f'Added {len(objects)} objects to editor.{message}')
 
     # Get a string representing all objects in readable format
     def read_objects(self, oid_alias: bool=False):
@@ -317,6 +439,11 @@ class Editor():
             if group in group_pool:
                 return False
         return True
+    
+    
+    # Disable logs when adding objects
+    def silence(self, val=True):
+        self.silent = val
     
 
     # -=====-

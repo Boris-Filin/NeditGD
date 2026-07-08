@@ -7,9 +7,9 @@ def read(fname):
 
 
 setup(
-    name='NeditGD',
+    name='neditgd',
     python_requires='>=3.12.0',
-    version='0.3.0',    
+    version='0.3.1',    
     description='Lightweight Geometry Dash level scripting tool',
     url='https://github.com/Boris-Filin/NeditGD',
     author='Nemo2510 (Boris Filin)',

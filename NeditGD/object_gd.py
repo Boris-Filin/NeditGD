@@ -1,7 +1,8 @@
 from __future__ import annotations
 from collections import UserDict
-from typing import Any, Iterable
+from typing import Any, Iterable, List
 from numbers import Number
+from enum import Enum
 from copy import deepcopy
 from NeditGD.Dictionaries.PropertyID import get_property_id
 from NeditGD.Dictionaries.IDNames import oid_from_alias, oid_to_alias
@@ -31,6 +32,10 @@ class Object(UserDict):
         for k, v in kwargs.items():
             obj[k] = v
         return obj
+
+    @staticmethod
+    def copy_all(objects: Iterable[Object]) -> List[Object]:
+        return [Object.copy(obj) for obj in objects]
 
     # When the object is accessed as a dictionary,
     # it automatically converts property aliases to integer ids
@@ -113,8 +118,16 @@ class Object(UserDict):
             obj[f'_{k}'] = properties.decode_property_pair(int(k), v)
         return Object(**obj)
     
+    def remove_enums(self):
+        for k in self:
+            v = self[k]
+            if isinstance(v, Enum):
+                self[k] = v.value
+
+    
     # To save an object, it is converted to RobTop's string encoding.
     def to_robtop(self) -> str:
+        self.remove_enums()
         res = ''
         for (k, v) in self.data.items():
             if Object.is_tmp_key(k): continue
@@ -172,12 +185,18 @@ class Object(UserDict):
         self.y = y
         return self
     
-    def add_group(self, group):
+    def add_group(self, group: int):
         if self.groups is None:
             self.groups = []
         self.groups.append(group)
         return self
-    
+
+    def add_groups(self, groups: List[int]):
+        if self.groups is None:
+            self.groups = []
+        self.groups += groups
+        return self
+
     def to_layer(self, layer: int):
         self.editor_layer_1 = layer
         return self

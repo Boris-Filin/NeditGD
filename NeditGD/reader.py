@@ -8,6 +8,7 @@ def read_objects(editor: Editor, args):
     objects = editor.read_objects(
         oid_alias=args.alias)
     print(objects)
+    print(editor.get_robtop_string())
 
 def read_ids(editor: Editor, args):
     print("[Nedit]: IDs of objects in level:")

@@ -228,15 +228,21 @@ NAME_TO_ID = {
     'dont_boost_y': 496,
     'seq_unique_remap': 505,
     'no_particle': 507,
+    'gradient_disable_all': 508,
     'dont_boost_x': 509,
     'extended_collision': 511,
     'event_target': 525,
+    'control_id': 534,
+    'use_control_id': 535,
     'dont_edit_area_parent': 539,
+    'silent_move': 544,
     'neg_op_1': 578,
     'neg_op_2': 579,
+    'stop_mode': 580
 }
 
 ALIASES = {
+    'layer': 'editor_layer_1',
     'remap': 'spawn_remap',
     'op_1': 'num_op_1',
     'op_2': 'num_op_2',
@@ -246,6 +252,10 @@ ALIASES = {
     'cmp_op': 'num_op_3',
     'item_2': 'block_b',
     'item': 'item_id',
+    'target_true': 'target',
+    'target_false': 'target_pos',
+    'follow_target': 'target_pos',
+    'delay': 'spawn_duration',
 }
 
 
